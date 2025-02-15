@@ -67,9 +67,7 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Controller functions
 
-// Sign-up route
 const signup = async (req, res) => {
 
     const { name, email } = req.body; 
@@ -83,7 +81,6 @@ const signup = async (req, res) => {
         const otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
 const password = await hashPassword(pass)
         user = new User({ name, email, password, otp, otpExpire });
-        // user.password = hashPassword(newPassword);
 
         await user.save();
 
@@ -95,7 +92,6 @@ const password = await hashPassword(pass)
     }
 };
 
-// Verify email with OTP route
 const verifyEmail = async (req, res) => {
     const { email, otp } = req.body;
     try {
@@ -113,7 +109,6 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-// Sign-in route
 const signin = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -136,7 +131,6 @@ const signin = async (req, res) => {
     }
 };
 
-// Forgot password (OTP generation) route
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     try {
@@ -158,7 +152,6 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-// Reset password route
 const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
     try {
@@ -176,18 +169,15 @@ const resetPassword = async (req, res) => {
     }
 };
 
-// Protected route
 const protectedRoute = (req, res) => {
 
     res.status(200).json({ msg: `Hello, user with ID: ${req.user.userId}` });
 };
 
-// Sign-out route
 const signout = (req, res) => {
     res.status(200).json({ msg: 'Signed out' });
 };
 
-// Exporting controller functions
 module.exports = {
     signup,
     verifyEmail,
