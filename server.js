@@ -24,6 +24,10 @@ const path = require("path");
 const archiver = require("archiver");
 const cors = require("cors");
 const axios = require("axios");
+const multer = require("multer");
+const fsv = require("fs-extra");
+const FormDataNode = require("form-data"); // Renamed FormData
+const AdmZip = require("adm-zip");
 require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -36,7 +40,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-const genAI = new GoogleGenerativeAI("AIzaSyB_q_4nVwcmGsn9mpJEGmnd2cc7RlFnaMk");
+// const genAI = new GoogleGenerativeAI("AIzaSyB_q_4nVwcmGsn9mpJEGmnd2cc7RlFnaMk");
+// AIzaSyD99S4PL8DTSFu4FyCnWi3jp7iQCi - RQtk
+const genAI = new GoogleGenerativeAI("AIzaSyD99S4PL8DTSFu4FyCnWi3jp7iQCi-RQtk");
 
 // const axios = require('axios');
 
@@ -338,8 +344,7 @@ app.post("/generate", async (req, res) => {
     if (!prompt) {
       return res.status(400).json({ error: "Missing prompt in request body" });
     }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(`
       Create a complete website based on the following prompt:
       ${prompt}
@@ -383,6 +388,84 @@ app.post("/generate", async (req, res) => {
       .json({ error: "Failed to generate website", details: error.message });
   }
 });
+
+const upload = multer({ dest: "uploads/" });
+
+// Function to create a new site on Netlify
+
+// API endpoint to receive ZIP file and deploy
+// app.post("/deploy", upload.single("zipFile"), async (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ error: "No file uploaded" });
+//   }
+
+//   const zipPath = req.file.path;
+
+//   try {
+//     // Create Netlify site
+//     const netlifySite = await createNetlifySite();
+//     const liveUrl = await deployToNetlify(zipPath, netlifySite.site_id);
+
+//     // Clean up uploaded ZIP file
+//     fs.unlinkSync(zipPath);
+
+//     res.status(200).json({
+//       site_id: netlifySite.site_id,
+//       liveUrl,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// API to receive files, create a ZIP, and return the ZIP URL
+app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ error: "No files uploaded" });
+  }
+
+  console.log("Received Files:");
+  req.files.forEach((file) => {
+    console.log(`- ${file.originalname}`);
+  });
+
+  const websiteFolder = path.join(__dirname, "website");
+  if (!fs.existsSync(websiteFolder)) {
+    fs.mkdirSync(websiteFolder, { recursive: true });
+  }
+
+  try {
+    // Move files to "website" folder and log file contents
+    for (const file of req.files) {
+      const newFilePath = path.join(websiteFolder, file.originalname);
+      fs.renameSync(file.path, newFilePath);
+
+      // Read and log file contents
+      // const fileContent = fs.readFileSync(newFilePath, "utf-8");
+      // console.log(`Contents of ${file.originalname}:\n${fileContent}\n`);
+    }
+
+    // Create ZIP from the website folder
+    const zipFilePath = await createZipFile(websiteFolder);
+    console.log("ZIP file created:", zipFilePath);
+
+    // Deploy to Netlify (dummy function for now)
+    const netlifySite = await createNetlifySite();
+    const liveUrl = await deployToNetlify(zipFilePath, netlifySite.site_id);
+    // console.log("Deployed to Netlify:", liveUrl);
+
+    res.json({
+      message: "ZIP file created and deployed successfully",
+      liveUrl,
+    });
+  } catch (error) {
+    console.error("Error creating ZIP file:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Dummy Netlify functions (Replace with actual Netlify API implementation)
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

@@ -1,526 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PGC-GYM Landing Page</title>
-<!-- Ion Icons Js -->
-<script type="module"
-src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
-<script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
-<!-- JS -->
-<!-- CSS -->
-<style>
-@import
-url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;400;500;700&display=swap");
-/* Base */
-:root {
---clr-primary: #29a396;
-}
-*,
-*::after,
-*::before {
-box-sizing: border-box;
-padding: 0;
-margin: 0;
-font-family: "Nunito", sans-serif;
-}
-html {
-scroll-behavior: smooth;
-}
-body {
-width: 100%;
-min-height: 100vh;
-background: radial-gradient(#111, #071a1a);
-color: #fff;
-overflow-x: hidden;
-}
-.container {
-width: 80%;
-margin: 0 auto;
-}
-.flex {
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.header,
-.section {
-width: 100%;
-padding: 40px 0;
-overflow: hidden;
-}
-.header::after,
-.header::before,
-.section::after,
-.section::before {
-content: "";
-background: url('https://raw.githubusercontent.com/programmercloud/pgc-gym/main/img/blur-1.png');
-position: absolute;
-width: 400px;
-height: 400px;
-background-position: center;
-background-repeat: no-repeat;
-background-size: contain;
-bottom: 0;
-}
-.header::after {
-left: -200px;
-}
-.header::before {
-right: -200px;
-}
-.mb {
-margin-bottom: 30px;
-}
-.mt {
-margin-top: 20px;
-}
-.section {
-background: #1d1f1e;
-position: relative;
-padding: 80px 0;
-}
-.section::after {
-left: -200px;
-}
-.section::before {
-width: 600px;
-right: -200px;
-}
-.section:nth-child(even) {
-background: #141615;
-}
-.section:nth-child(even)::after,
-.section:nth-child(even)::before {
-display: none;
-}
-.primary {
-font-size: 35px;
-font-weight: 700;
-}
-.secondary {
-font-size: 25px;
-font-weight: 700;
-}
-.tertiary {
-font-size: 15px;
-}
-/* End Base */
-/* Menu */
-.menu {
-width: 100%;
-background: linear-gradient(to right, #0e0e0e 70%, #142d2a);
-padding: 12px 0;
-}
-.menu .container {
-justify-content: space-between;
-}
-.mobile-btn {
-display: none;
-}
-.logo {
-cursor: pointer;
-}
-.logo img {
-width: 80px;
-height: auto;
-}
-.nav {
-list-style: none;
-}
-.nav-item {
-display: inline-block;
-margin-right: 30px;
-font-size: 18px;
-font-weight: 400;
-}
-.nav-item a {
-text-decoration: none;
-color: #fff;
-}
-.nav-item:hover a {
-color: #29a396;
-transition: 0.3s linear;
-}
-.nav-item:last-of-type {
-margin-right: 0;
-}
-/* End Menu */
-/* Buttons */
-.btn {
-padding: 10px 28px;
-background: var(--clr-primary);
-border-radius: 40px;
-font-size: 20px;
-font-weight: 400;
-text-decoration: none;
-color: #fff;
-display: inline-block;
-}
-.btn:hover {
-background: #165f56;
-transition: 0.3s linear;
-}
-.btn-2 {
-font-size: 35px;
-text-decoration: none;
-color: #ccc;
-transition: 0.3s linear;
-}
-.btn-2:hover {
-color: #29a396;
-}
-/* End Buttons */
-/* Header */
-.text {
-width: 60%;
-}
-.visual {
-width: 40%;
-}
-.visual img {
-width: 100%;
-}
-.header h1 {
-font-size: 70px;
-font-weight: 700;
-}
-.header h1 span {
-color: var(--clr-primary);
-}
-/* End Header */
-.section:nth-child(even) .visual {
-margin-right: 30px;
-}
-/* Trainer */
-#trainer {
-text-align: center;
-}
-.trainer img {
-border-top-left-radius: 80px;
-border-top-right-radius: 20px;
-border-bottom-right-radius: 80px;
-border-bottom-left-radius: 20px;
-margin-bottom: 10px;
-outline: 2px solid #fff;
-padding: 14px;
-}
-.trainer .mb {
-margin-bottom: 10px;
-}
-/* End Trainer */
-/* Testimonial */
-#testimonial .visual img {
-width: 90%;
-display: block;
-margin-left: auto;
-}
-.client {
-background: #fff;
-color: #000;
-padding: 20px 10px;
-margin-right: 20px;
-text-align: center;
-border-radius: 20px;
-position: relative;
-margin-top: 20px;
-}
-.client img {
-width: 80px;
-height: 80px;
-border-radius: 50%;
-position: absolute;
-top: -40px;
-left: calc(50% - 40px);
-}
-.client h2 {
-margin: 20px 0 10px 0;
-}
-/* End Testimonial */
-/* Discount */
-#discount {
-padding: 40px 0;
-}
-/* End Discount */
-/* Footer */
-.footer {
-padding: 30px 0;
-border-top: 1px solid #fff;
-text-align: center;
-}
-/* End Footer */
-/* Responsive */
-@media (max-width: 768px) {
-.flex {
-flex-direction: column;
-text-align: center;
-}
-.mobile-btn {
-display: block;
-font-size: 35px;
-cursor: pointer;
-position: absolute;
-right: 20px;
-top: 12px;
-}
-.menu.active .nav-item {
-display: block;
-margin: 30px 0;
-}
-.nav,
-.menu .btn {
-display: none;
-}
-.menu.active .nav,
-.menu.active .btn {
-display: block;
-}
-.menu.active {
-padding: 30px 0;
-width: 100%;
-transition: all 0.8s ease;
-}
-.text,
-.visual {
-width: 100%;
-margin-bottom: 20px;
-}
-.text h1 {
-font-size: 45px;
-}
-.primary {
-font-size: 28px;
-}
-.secondary {
-font-size: 22px;
-}
-.tertiary {
-font-size: 14px;
-}
-.trainer {
-margin-bottom: 20px;
-}
-.client {
-margin-bottom: 50px;
-}
-#discount .visual img {
-width: 70%;
-margin-bottom: 30px;
-}
-}
-@media (max-width: 530px) {
-.header::after,
-.header::before,
-.section::after,
-.section::before {
-display: none;
-}
-.primary {
-font-size: 25px;
-}
-.secondary {
-font-size: 20px;
-}
-.tertiary {
-font-size: 12px;
-}
-.text h1 {
-font-size: 34px;
-}
-.btn,
-.btn-2 {
-font-size: 16px;
-}
-}
-/* End Responsive */
-</style>
-</head>
-<body>
-<!-- Menu -->
-<div class="menu">
-<div class="container flex">
-<!-- Mobile Button -->
-<div class="mobile-btn">
-<ion-icon name="grid"></ion-icon>
-</div>
-<div class="logo">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/logo.png" alt="" />
-</div>
-<ul class="nav">
-<li class="nav-item"><a href="#">Home</a></li>
-<li class="nav-item"><a href="#why-us">Features</a></li>
-<li class="nav-item"><a href="#explore">Explore</a></li>
-<li class="nav-item"><a href="#discount">Register</a></li>
-</ul>
-<a href="#" class="btn">Register</a>
-</div>
-</div>
-<!-- End Menu -->
-<!-- Header -->
-<header class="header">
-<div class="container flex">
-<div class="text">
-<h1 class="mb">
-Complete Daily <br />
-<span>Workout</span> At Home
-</h1>
-<p class="mb">
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minima
-sunt sed tempora neque molestiae corrupti nobis harum ullam eos nam!
-</p>
-<a href="#" class="btn mt">Get Started Now</a>
-</div>
-<div class="visual">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/banner-img.png" alt="" />
-</div>
-</div>
-</header>
-<!-- End Header -->
-<!-- Why Us -->
-<div class="section" id="why-us">
-<div class="container flex">
-<div class="text">
-<h2 class="primary mb">Why Choose Us?</h2>
-<h3 class="secondary mb">Consulatation with Expert.</h3>
-<p class="tertiary">
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Alias quos
-maxime tempore?
-</p>
-<h3 class="secondary mb">Consulatation with Expert.</h3>
-<p class="tertiary">
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Alias quos
-maxime tempore?
-</p>
-</div>
-<div class="visual">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-gym/main/img/why-
-us.png" alt="" />
-</div>
-</div>
-</div>
-<!-- End Why Us -->
-<!-- Explore -->
-<div class="section" id="explore">
-<div class="container flex">
-<div class="visual">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/explore.jpg" alt="" />
-</div>
-<div class="text">
-<h2 class="primary mb">
-Explore Our Fitness <br />
-Studio
-</h2>
-<p class="tertiary mb">
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis
-esse vitae ratione quos maiores eveniet temporibus illum! Eligendi
-amet officia unde sint totam ut optio. Molestiae, illo quia?
-</p>
-<a href="#" class="btn mt">Get Started Now</a>
-</div>
-</div>
-</div>
-<!-- End Explore -->
-<!-- Trainer -->
-<div class="section" id="trainer">
-<h2 class="primary mb">Our Professional Trainers</h2>
-<div class="container flex">
-<div class="trainer">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/trainer1.jpg" alt="" />
-<h3 class="secondary mb">Alan Smith</h3>
-<p class="tertiary mb">
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla.
-</p>
-<a href="#" class="btn-2">
-<ion-icon name="arrow-redo-circle-outline"></ion-icon>
-</a>
-</div>
-<div class="trainer">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/trainer2.jpg" alt="" />
-<h3 class="secondary mb">Alan Smith</h3>
-<p class="tertiary mb">
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla.
-</p>
-<a href="#" class="btn-2">
-<ion-icon name="arrow-redo-circle-outline"></ion-icon>
-</a>
-</div>
-<div class="trainer">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/trainer3.jpg" alt="" />
-<h3 class="secondary mb">Alan Smith</h3>
-<p class="tertiary mb">
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla.
-</p>
-<a href="#" class="btn-2">
-<ion-icon name="arrow-redo-circle-outline"></ion-icon>
-</a>
-</div>
-</div>
-</div>
-<!-- End Trainer -->
-<!-- Testimonial -->
-<div class="section" id="testimonial">
-<div class="container flex">
-<div class="text">
-<h2 class="primary">
-That's What Our Super <br />
-Client Says
-</h2>
-<br />
-<br />
-<br />
-<div class="client">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/client1.jpg" alt="" />
-<h2 class="secondary">Exelent Training</h2>
-<p class="tertiary">
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
-quas voluptatem ad, repudiandae voluptates odio deleniti
-reiciendis in veniam quidem expedita maxime error fugit. Pariatur
-quasi sunt aut id. Lorem, ipsum dolor sit amet consectetur
-adipisicing elit. Neque, officiis.
-</p>
-</div>
-</div>
-<div class="visual">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/testimonial.png" alt="" />
-</div>
-</div>
-</div>
-<!-- End Testimonial -->
-<!-- Discount -->
-<div class="section" id="discount">
-<div class="container flex">
-<div class="visual">
-<img src="https://raw.githubusercontent.com/programmercloud/pgc-
-gym/main/img/discount.png" alt="" />
-</div>
-<div class="text">
-<h2 class="primary mb">
-Fitness Classes This Summer, Pay Now And Get 25% Discount
-</h2>
-<p class="tertiary mb">
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab maxime
-minus praesentium est et veniam voluptate alias excepturi minima
-placeat amet nostrum, eligendi, quod cum ducimus nesciunt ipsa eum,
-explicabo eaque obcaecati.
-</p>
-<a href="#" class="btn bt">Book Now</a>
-</div>
-</div>
-</div>
-<!-- End Discount -->
-<!-- Footer -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PGC-GYM Landing Page</title>
+    <!-- Ion Icons Js -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"
+    ></script>
+    <!-- JS -->
+    <!-- CSS -->
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@200;400;500;700&display=swap");
+      /* Base */
+      :root {
+        --clr-primary: #29a396;
+      }
+      *,
+      *::after,
+      *::before {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+        font-family: "Nunito", sans-serif;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        width: 100%;
+        min-height: 100vh;
+        background: radial-gradient(#111, #071a1a);
+        color: #fff;
+        overflow-x: hidden;
+      }
+      .container {
+        width: 80%;
+        margin: 0 auto;
+      }
+      .flex {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .header,
+      .section {
+        width: 100%;
+        padding: 40px 0;
+        overflow: hidden;
+      }
+      .header::after,
+      .header::before,
+      .section::after,
+      .section::before {
+        content: "";
+        background: url("https://raw.githubusercontent.com/programmercloud/pgc-gym/main/img/blur-1.png");
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        bottom: 0;
+      }
+      .header::after {
+        left: -200px;
+      }
+      .header::before {
+        right: -200px;
+      }
+      .mb {
+        margin-bottom: 30px;
+      }
+      .mt {
+        margin-top: 20px;
+      }
+      .section {
+        background: #1d1f1e;
+        position: relative;
+        padding: 80px 0;
+      }
+      .section::after {
+        left: -200px;
+      }
+      .section::before {
+        width: 600px;
+        right: -200px;
+      }
+      .section:nth-child(even) {
+        background: #141615;
+      }
+      .section:nth-child(even)::after,
+      .section:nth-child(even)::before {
+        display: none;
+      }
+      .primary {
+        font-size: 35px;
+        font-weight: 700;
+      }
+      .secondary {
+        font-size: 25px;
+        font-weight: 700;
+      }
+      .tertiary {
+        font-size: 15px;
+      }
+      /* End Base */
+      /* Menu */
+      .menu {
+        width: 100%;
+        background: linear-gradient(to right, #0e0e0e 70%, #142d2a);
+        padding: 12px 0;
+      }
+      .menu .container {
+        justify-content: space-between;
+      }
+      .mobile-btn {
+        display: none;
+      }
+      .logo {
+        cursor: pointer;
+      }
+      .logo img {
+        width: 80px;
+        height: auto;
+      }
+      .nav {
+        list-style: none;
+      }
+      .nav-item {
+        display: inline-block;
+        margin-right: 30px;
+        font-size: 18px;
+        font-weight: 400;
+      }
+      .nav-item a {
+        text-decoration: none;
+        color: #fff;
+      }
+      .nav-item:hover a {
+        color: #29a396;
+        transition: 0.3s linear;
+      }
+      .nav-item:last-of-type {
+        margin-right: 0;
+      }
+      /* End Menu */
+      /* Buttons */
+      .btn {
+        padding: 10px 28px;
+        background: var(--clr-primary);
+        border-radius: 40px;
+        font-size: 20px;
+        font-weight: 400;
+        text-decoration: none;
+        color: #fff;
+        display: inline-block;
+      }
+      .btn:hover {
+        background: #165f56;
+        transition: 0.3s linear;
+      }
+      .btn-2 {
+        font-size: 35px;
+        text-decoration: none;
+        color: #ccc;
+        transition: 0.3s linear;
+      }
+      .btn-2:hover {
+        color: #29a396;
+      }
+      /* End Buttons */
+      /* Header */
+      .text {
+        width: 60%;
+      }
+      .visual {
+        width: 40%;
+      }
+      .visual img {
+        width: 100%;
+      }
+      .header h1 {
+        font-size: 70px;
+        font-weight: 700;
+      }
+      .header h1 span {
+        color: var(--clr-primary);
+      }
+      /* End Header */
+      .section:nth-child(even) .visual {
+        margin-right: 30px;
+      }
+      /* Trainer */
+      #trainer {
+        text-align: center;
+      }
+      .trainer img {
+        border-top-left-radius: 80px;
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 80px;
+        border-bottom-left-radius: 20px;
+        margin-bottom: 10px;
+        outline: 2px solid #fff;
+        padding: 14px;
+      }
+      .trainer .mb {
+        margin-bottom: 10px;
+      }
+      /* End Trainer */
+      /* Testimonial */
+      #testimonial .visual img {
+        width: 90%;
+        display: block;
+        margin-left: auto;
+      }
+      .client {
+        background: #fff;
+        color: #000;
+        padding: 20px 10px;
+        margin-right: 20px;
+        text-align: center;
+        border-radius: 20px;
+        position: relative;
+        margin-top: 20px;
+      }
+      .client img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        position: absolute;
+        top: -40px;
+        left: calc(50% - 40px);
+      }
+      .client h2 {
+        margin: 20px 0 10px 0;
+      }
+      /* End Testimonial */
+      /* Discount */
+      #discount {
+        padding: 40px 0;
+      }
+      /* End Discount */
+      /* Footer */
+      .footer {
+        padding: 30px 0;
+        border-top: 1px solid #fff;
+        text-align: center;
+      }
+      /* End Footer */
+      /* Responsive */
+      @media (max-width: 768px) {
+        .flex {
+          flex-direction: column;
+          text-align: center;
+        }
+        .mobile-btn {
+          display: block;
+          font-size: 35px;
+          cursor: pointer;
+          position: absolute;
+          right: 20px;
+          top: 12px;
+        }
+        .menu.active .nav-item {
+          display: block;
+          margin: 30px 0;
+        }
+        .nav,
+        .menu .btn {
+          display: none;
+        }
+        .menu.active .nav,
+        .menu.active .btn {
+          display: block;
+        }
+        .menu.active {
+          padding: 30px 0;
+          width: 100%;
+          transition: all 0.8s ease;
+        }
+        .text,
+        .visual {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+        .text h1 {
+          font-size: 45px;
+        }
+        .primary {
+          font-size: 28px;
+        }
+        .secondary {
+          font-size: 22px;
+        }
+        .tertiary {
+          font-size: 14px;
+        }
+        .trainer {
+          margin-bottom: 20px;
+        }
+        .client {
+          margin-bottom: 50px;
+        }
+        #discount .visual img {
+          width: 70%;
+          margin-bottom: 30px;
+        }
+      }
+      @media (max-width: 530px) {
+        .header::after,
+        .header::before,
+        .section::after,
+        .section::before {
+          display: none;
+        }
+        .primary {
+          font-size: 25px;
+        }
+        .secondary {
+          font-size: 20px;
+        }
+        .tertiary {
+          font-size: 12px;
+        }
+        .text h1 {
+          font-size: 34px;
+        }
+        .btn,
+        .btn-2 {
+          font-size: 16px;
+        }
+      }
+      /* End Responsive */
+    </style>
+  </head>
+  <body>
+    <!-- Menu -->
+    <div class="menu">
+      <div class="container flex">
+        <!-- Mobile Button -->
+        <div class="mobile-btn">
+          <ion-icon name="grid"></ion-icon>
+        </div>
+        <div class="logo">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/logo.png"
+            alt=""
+          />
+        </div>
+        <ul class="nav">
+          <li class="nav-item"><a href="#">Home</a></li>
+          <li class="nav-item"><a href="#why-us">Features</a></li>
+          <li class="nav-item"><a href="#explore">Explore</a></li>
+          <li class="nav-item"><a href="#discount">Register</a></li>
+        </ul>
+        <a href="#" class="btn">Register</a>
+      </div>
+    </div>
+    <!-- End Menu -->
+    <!-- Header -->
+    <header class="header">
+      <div class="container flex">
+        <div class="text">
+          <h1 class="mb">
+            {{Complete Daily}} <br />
+            <span>Workout</span> At Home
+          </h1>
+          <p class="mb">{{description}}</p>
+          <a href="#" class="btn mt">Get Started Now</a>
+        </div>
+        <div class="visual">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/banner-img.png"
+            alt=""
+          />
+        </div>
+      </div>
+    </header>
+    <!-- End Header -->
+    <!-- Why Us -->
+    <div class="section" id="why-us">
+      <div class="container flex">
+        <div class="text">
+          <h2 class="primary mb">Why Choose Us?</h2>
+          <h3 class="secondary mb">Consulatation with Expert.</h3>
+          <p class="tertiary">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Alias quos
+            maxime tempore?
+          </p>
+          <h3 class="secondary mb">Consulatation with Expert.</h3>
+          <p class="tertiary">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Alias quos
+            maxime tempore?
+          </p>
+        </div>
+        <div class="visual">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-gym/main/img/why-
+us.png"
+            alt=""
+          />
+        </div>
+      </div>
+    </div>
+    <!-- End Why Us -->
+    <!-- Explore -->
+    <div class="section" id="explore">
+      <div class="container flex">
+        <div class="visual">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/explore.jpg"
+            alt=""
+          />
+        </div>
+        <div class="text">
+          <h2 class="primary mb">
+            Explore Our Fitness <br />
+            Studio
+          </h2>
+          <p class="tertiary mb">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis
+            esse vitae ratione quos maiores eveniet temporibus illum! Eligendi
+            amet officia unde sint totam ut optio. Molestiae, illo quia?
+          </p>
+          <a href="#" class="btn mt">Get Started Now</a>
+        </div>
+      </div>
+    </div>
+    <!-- End Explore -->
+    <!-- Trainer -->
+    <div class="section" id="trainer">
+      <h2 class="primary mb">Our Professional Trainers</h2>
+      <div class="container flex">
+        <div class="trainer">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/trainer1.jpg"
+            alt=""
+          />
+          <h3 class="secondary mb">Alan Smith</h3>
+          <p class="tertiary mb">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla.
+          </p>
+          <a href="#" class="btn-2">
+            <ion-icon name="arrow-redo-circle-outline"></ion-icon>
+          </a>
+        </div>
+        <div class="trainer">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/trainer2.jpg"
+            alt=""
+          />
+          <h3 class="secondary mb">Alan Smith</h3>
+          <p class="tertiary mb">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla.
+          </p>
+          <a href="#" class="btn-2">
+            <ion-icon name="arrow-redo-circle-outline"></ion-icon>
+          </a>
+        </div>
+        <div class="trainer">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/trainer3.jpg"
+            alt=""
+          />
+          <h3 class="secondary mb">Alan Smith</h3>
+          <p class="tertiary mb">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla.
+          </p>
+          <a href="#" class="btn-2">
+            <ion-icon name="arrow-redo-circle-outline"></ion-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- End Trainer -->
+    <!-- Testimonial -->
+    <div class="section" id="testimonial">
+      <div class="container flex">
+        <div class="text">
+          <h2 class="primary">
+            That's What Our Super <br />
+            Client Says
+          </h2>
+          <br />
+          <br />
+          <br />
+          <div class="client">
+            <img
+              src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/client1.jpg"
+              alt=""
+            />
+            <h2 class="secondary">Exelent Training</h2>
+            <p class="tertiary">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi
+              quas voluptatem ad, repudiandae voluptates odio deleniti
+              reiciendis in veniam quidem expedita maxime error fugit. Pariatur
+              quasi sunt aut id. Lorem, ipsum dolor sit amet consectetur
+              adipisicing elit. Neque, officiis.
+            </p>
+          </div>
+        </div>
+        <div class="visual">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/testimonial.png"
+            alt=""
+          />
+        </div>
+      </div>
+    </div>
+    <!-- End Testimonial -->
+    <!-- Discount -->
+    <div class="section" id="discount">
+      <div class="container flex">
+        <div class="visual">
+          <img
+            src="https://raw.githubusercontent.com/programmercloud/pgc-
+gym/main/img/discount.png"
+            alt=""
+          />
+        </div>
+        <div class="text">
+          <h2 class="primary mb">
+            Fitness Classes This Summer, Pay Now And Get 25% Discount
+          </h2>
+          <p class="tertiary mb">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab maxime
+            minus praesentium est et veniam voluptate alias excepturi minima
+            placeat amet nostrum, eligendi, quod cum ducimus nesciunt ipsa eum,
+            explicabo eaque obcaecati.
+          </p>
+          <a href="#" class="btn bt">Book Now</a>
+        </div>
+      </div>
+    </div>
+    <!-- End Discount -->
+    <!-- Footer -->
 
-<!-- End Footer -->
-
-</body>
+    <!-- End Footer -->
+  </body>
 </html>
