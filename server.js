@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
+// const { uploadToFirebase } = require("./firebaseConfig");
 const {
   createWebsiteEntry,
   updateWebsiteEntry,
@@ -220,6 +220,7 @@ const deleteNetlifySite = async (siteId) => {
     throw error;
   }
 };
+
 app.post("/generate-sites", async (req, res) => {
   const { username, templateName, siteData, userId } = req.body;
   console.log(req.body);
@@ -389,6 +390,65 @@ app.post("/generate", async (req, res) => {
   }
 });
 
+const chatSessions = new Map();
+
+// Chat endpoint
+app.post("/chat", async (req, res) => {
+  try {
+    const { message, sessionId = "default" } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Missing message in request body" });
+    }
+
+    // Get or initialize chat history for this session
+    if (!chatSessions.has(sessionId)) {
+      chatSessions.set(sessionId, []);
+    }
+
+    const chatHistory = chatSessions.get(sessionId);
+
+    // Get Gemini model
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // Add user message to history
+    chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+    // Start a chat session
+    const chat = model.startChat({
+      history: chatHistory,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 800,
+      },
+    });
+
+    // Generate response
+    const result = await chat.sendMessage(message);
+    const response = result.response;
+    const responseText = response.text();
+
+    // Add AI response to history
+    chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+
+    // Keep chat history within reasonable limits (last 20 messages)
+    if (chatHistory.length > 20) {
+      chatSessions.set(sessionId, chatHistory.slice(-20));
+    }
+
+    res.json({
+      reply: responseText,
+      sessionId: sessionId,
+    });
+  } catch (error) {
+    console.error("Error in chat:", error);
+    res.status(500).json({
+      error: "Failed to process chat message",
+      details: error.message,
+    });
+  }
+});
+
 const upload = multer({ dest: "uploads/" });
 
 // Function to create a new site on Netlify
@@ -435,36 +495,40 @@ app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
   }
 
   try {
-    // Move files to "website" folder and log file contents
-    for (const file of req.files) {
-      const newFilePath = path.join(websiteFolder, file.originalname);
-      fs.renameSync(file.path, newFilePath);
-
-      // Read and log file contents
-      // const fileContent = fs.readFileSync(newFilePath, "utf-8");
-      // console.log(`Contents of ${file.originalname}:\n${fileContent}\n`);
-    }
-
-    // Create ZIP from the website folder
     const zipFilePath = await createZipFile(websiteFolder);
     console.log("ZIP file created:", zipFilePath);
 
-    // Deploy to Netlify (dummy function for now)
     const netlifySite = await createNetlifySite();
     const liveUrl = await deployToNetlify(zipFilePath, netlifySite.site_id);
-    // console.log("Deployed to Netlify:", liveUrl);
 
+    const websiteData = {
+      userId: req.body.userId,
+      username: `AI-${Date.now()}`,
+      templateName: "AI",
+      siteData: "AI",
+      siteId: netlifySite.site_id,
+      liveUrl: liveUrl,
+    };
+    await createWebsiteEntry(websiteData);
     res.json({
       message: "ZIP file created and deployed successfully",
       liveUrl,
+    });
+
+    req.files.forEach((file) => {
+      fs.unlink(file.path, (err) => {
+        if (err) {
+          console.error(`Error deleting file ${file.path}:`, err);
+        } else {
+          console.log(`Deleted file: ${file.path}`);
+        }
+      });
     });
   } catch (error) {
     console.error("Error creating ZIP file:", error);
     res.status(500).json({ error: error.message });
   }
 });
-
-// Dummy Netlify functions (Replace with actual Netlify API implementation)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
