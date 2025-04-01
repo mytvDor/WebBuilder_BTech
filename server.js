@@ -221,13 +221,101 @@ const deleteNetlifySite = async (siteId) => {
   }
 };
 
+// app.post("/generate-sites", async (req, res) => {
+//   const { username, templateName, siteData, userId } = req.body;
+//   console.log(req.body);
+//   try {
+//     const userDir = createWebsite(username, templateName, siteData);
+//     const zipPath = await createZipFile(userDir);
+
+//     const netlifySite = await createNetlifySite();
+//     const liveUrl = await deployToNetlify(zipPath, netlifySite.site_id);
+
+//     // Save the website details in the database
+//     const websiteData = {
+//       userId,
+//       username,
+//       templateName,
+//       siteData,
+//       siteId: netlifySite.site_id,
+//       liveUrl: liveUrl,
+//     };
+//     await createWebsiteEntry(websiteData); //database
+
+//     fs.unlinkSync(zipPath);
+//     deleteFolderRecursive(userDir);
+//     console.log(
+//       `Website for ${websiteData.username}\n\n  netlify site id : ${netlifySite.site_id} \n\n\t is live at: ${liveUrl} \n\n`
+//     );
+
+//     res.status(200).json({
+//       site_id: netlifySite.site_id,
+//       liveUrl: liveUrl,
+//     });
+//   } catch (error) {
+//     console.error("Error:", error.message);
+//     res.status(500).send(`Failed to deploy website. Error: ${error.message}`);
+//   }
+// });
+// app.put("/update-site", async (req, res) => {
+//   const { siteId, username, templateName, siteData, userId } = req.body;
+
+//   try {
+//     // Check if the site exists
+//     console.log(`Checking if site with ID: ${siteId} exists...`);
+//     const site = await getNetlifySiteById(siteId);
+//     if (!site) {
+//       return res.status(404).send(`Site with ID ${siteId} not found.`);
+//     }
+
+//     console.log(`Site found. Updating site for ${username}...`);
+
+//     // Create the updated website content based on form data
+//     const userDir = createWebsite(username, templateName, siteData);
+//     const zipPath = await createZipFile(userDir);
+
+//     console.log(
+//       `Deploying updated content to Netlify site with ID: ${siteId}...`
+//     );
+//     const liveUrl = await updateNetlifySite(zipPath, siteId);
+//     console.log(`Website for ${username} updated and live at: ${liveUrl}`);
+
+//     // Clean up the files
+//     fs.unlinkSync(zipPath);
+//     deleteFolderRecursive(userDir);
+
+//     await updateWebsiteEntry(siteId, {
+//       username,
+//       templateName,
+//       siteData,
+//       liveUrl,
+//       userId,
+//     });
+
+//     res.status(200).json({
+//       site_id: siteId,
+//       liveUrl: liveUrl,
+//     });
+//   } catch (error) {
+//     console.error(`Error updating site for ${username}:`, error.message);
+//     res.status(500).send(`Failed to update site. Error: ${error.message}`);
+//   }
+// });
+
+// Modified generate-sites endpoint
 app.post("/generate-sites", async (req, res) => {
   const { username, templateName, siteData, userId } = req.body;
-  console.log(req.body);
-  try {
-    const userDir = createWebsite(username, templateName, siteData);
-    const zipPath = await createZipFile(userDir);
+  console.log("Generating site with data:", req.body);
 
+  try {
+    // Create website directory with all template files and updated HTML
+    const userDir = createWebsite(username, templateName, siteData);
+
+    // Create zip file from the directory
+    const zipPath = await createZipFile(userDir);
+    console.log("ZIP file created:", zipPath);
+
+    // Deploy to Netlify
     const netlifySite = await createNetlifySite();
     const liveUrl = await deployToNetlify(zipPath, netlifySite.site_id);
 
@@ -242,10 +330,12 @@ app.post("/generate-sites", async (req, res) => {
     };
     await createWebsiteEntry(websiteData);
 
-    fs.unlinkSync(zipPath);
-    deleteFolderRecursive(userDir);
+    // Clean up temporary files
+    // fs.unlinkSync(zipPath);
+    // deleteFolderRecursive(userDir);
+
     console.log(
-      `Website for ${websiteData.username}\n\n  netlify site id : ${netlifySite.site_id} \n\n\t is live at: ${liveUrl} \n\n`
+      `Website for ${websiteData.username}\n\n  netlify site id: ${netlifySite.site_id} \n\n\t is live at: ${liveUrl} \n\n`
     );
 
     res.status(200).json({
@@ -253,10 +343,12 @@ app.post("/generate-sites", async (req, res) => {
       liveUrl: liveUrl,
     });
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error generating site:", error.message);
     res.status(500).send(`Failed to deploy website. Error: ${error.message}`);
   }
 });
+
+// Modified update-site endpoint
 app.put("/update-site", async (req, res) => {
   const { siteId, username, templateName, siteData, userId } = req.body;
 
@@ -270,7 +362,7 @@ app.put("/update-site", async (req, res) => {
 
     console.log(`Site found. Updating site for ${username}...`);
 
-    // Create the updated website content based on form data
+    // Create the updated website content with all template files
     const userDir = createWebsite(username, templateName, siteData);
     const zipPath = await createZipFile(userDir);
 
@@ -301,7 +393,6 @@ app.put("/update-site", async (req, res) => {
     res.status(500).send(`Failed to update site. Error: ${error.message}`);
   }
 });
-
 app.delete("/delete-site", async (req, res) => {
   const { siteId } = req.body;
 
@@ -374,7 +465,8 @@ app.post("/generate", async (req, res) => {
     const cleanedCss = css.replace(/^```[a-zA-Z]+\s*/, "").replace(/```$/, "");
     const cleanedJavascript = javascript
       .replace(/^```[a-zA-Z]+\s*/, "")
-      .replace(/```$/, "");
+      // .replace(/```$/, "")
+      .replace(/```[\s\S]*$/, ""); // Removes everything from the last triple backticks onward
 
     res.json({
       message: "Website generated successfully",
@@ -479,6 +571,57 @@ const upload = multer({ dest: "uploads/" });
 // });
 
 // API to receive files, create a ZIP, and return the ZIP URL
+// app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
+//   if (!req.files || req.files.length === 0) {
+//     return res.status(400).json({ error: "No files uploaded" });
+//   }
+
+//   console.log("Received Files:");
+//   req.files.forEach((file) => {
+//     console.log(`- ${file.originalname}`);
+//   });
+
+//   const websiteFolder = path.join(__dirname, "website");
+//   if (!fs.existsSync(websiteFolder)) {
+//     fs.mkdirSync(websiteFolder, { recursive: true });
+//   }
+
+//   try {
+//     const zipFilePath = await createZipFile(websiteFolder);
+//     console.log("ZIP file created:", zipFilePath);
+
+//     const netlifySite = await createNetlifySite();
+//     const liveUrl = await deployToNetlify(zipFilePath, netlifySite.site_id);
+
+//     const websiteData = {
+//       userId: req.body.userId,
+//       username: `AI-${Date.now()}`,
+//       templateName: "AI",
+//       siteData: "AI",
+//       siteId: netlifySite.site_id,
+//       liveUrl: liveUrl,
+//     };
+//     await createWebsiteEntry(websiteData);
+//     res.json({
+//       message: "ZIP file created and deployed successfully",
+//       liveUrl,
+//     });
+
+//     req.files.forEach((file) => {
+//       fs.unlink(file.path, (err) => {
+//         if (err) {
+//           console.error(`Error deleting file ${file.path}:`, err);
+//         } else {
+//           console.log(`Deleted file: ${file.path}`);
+//         }
+//       });
+//     });
+//   } catch (error) {
+//     console.error("Error creating ZIP file:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
 app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: "No files uploaded" });
@@ -490,11 +633,31 @@ app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
   });
 
   const websiteFolder = path.join(__dirname, "website");
+
+  // Ensure the website folder exists
   if (!fs.existsSync(websiteFolder)) {
     fs.mkdirSync(websiteFolder, { recursive: true });
+  } else {
+    // Empty the website folder by removing all existing files and subdirectories
+    fs.readdirSync(websiteFolder).forEach((file) => {
+      const filePath = path.join(websiteFolder, file);
+      if (fs.lstatSync(filePath).isDirectory()) {
+        fs.rmdirSync(filePath, { recursive: true });
+      } else {
+        fs.unlinkSync(filePath);
+      }
+    });
+    console.log("Website folder emptied successfully");
   }
 
+  // Copy uploaded files to the website folder
   try {
+    for (const file of req.files) {
+      const destPath = path.join(websiteFolder, file.originalname);
+      await fs.promises.copyFile(file.path, destPath);
+      console.log(`Copied ${file.originalname} to website folder`);
+    }
+
     const zipFilePath = await createZipFile(websiteFolder);
     console.log("ZIP file created:", zipFilePath);
 
@@ -515,6 +678,7 @@ app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
       liveUrl,
     });
 
+    // Clean up temporary uploaded files
     req.files.forEach((file) => {
       fs.unlink(file.path, (err) => {
         if (err) {
@@ -525,7 +689,7 @@ app.post("/deploy-ai-site", upload.array("files"), async (req, res) => {
       });
     });
   } catch (error) {
-    console.error("Error creating ZIP file:", error);
+    console.error("Error in deployment process:", error);
     res.status(500).json({ error: error.message });
   }
 });
