@@ -331,8 +331,8 @@ app.post("/generate-sites", async (req, res) => {
     await createWebsiteEntry(websiteData);
 
     // Clean up temporary files
-    // fs.unlinkSync(zipPath);
-    // deleteFolderRecursive(userDir);
+    fs.unlinkSync(zipPath);
+    deleteFolderRecursive(userDir);
 
     console.log(
       `Website for ${websiteData.username}\n\n  netlify site id: ${netlifySite.site_id} \n\n\t is live at: ${liveUrl} \n\n`
