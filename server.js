@@ -29,6 +29,15 @@ const fsv = require("fs-extra");
 const FormDataNode = require("form-data"); // Renamed FormData
 const AdmZip = require("adm-zip");
 require("dotenv").config();
+const {
+  createZipFile,
+  deleteFolderRecursive,
+  createNetlifySite,
+  deployToNetlify,
+  updateNetlifySite,
+  getNetlifySiteById,
+  deleteNetlifySite,
+} = require("./utils");
 const app = express();
 const PORT = process.env.PORT || 8000;
 const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -44,265 +53,147 @@ app.use(cors());
 // AIzaSyD99S4PL8DTSFu4FyCnWi3jp7iQCi - RQtk
 const genAI = new GoogleGenerativeAI("AIzaSyD99S4PL8DTSFu4FyCnWi3jp7iQCi-RQtk");
 
-// const axios = require('axios');
+// const createZipFile = async (sourceDir) => {
+//   const zipPath = `${sourceDir}.zip`;
+//   const output = fs.createWriteStream(zipPath);
+//   const archive = archiver("zip");
 
-// async function attachCustomDomain(siteId, accessToken, domainName) {
-//   try {
-//     const response = await axios({
-//       method: 'post',
-//       url: `https://api.netlify.com/api/v1/sites/${siteId}/domains`,
-//       headers: {
-//         'Authorization': `Bearer ${accessToken}`,
-//         'Content-Type': 'application/json'
-//       },
-//       data: {
-//         domain: domainName
+//   return new Promise((resolve, reject) => {
+//     output.on("close", () => resolve(zipPath));
+//     archive.on("error", (err) => reject(err));
+
+//     archive.pipe(output);
+//     archive.directory(sourceDir, false);
+//     archive.finalize();
+//   });
+// };
+
+// const deleteFolderRecursive = (folderPath) => {
+//   if (fs.existsSync(folderPath)) {
+//     fs.readdirSync(folderPath).forEach((file) => {
+//       const curPath = path.join(folderPath, file);
+//       if (fs.lstatSync(curPath).isDirectory()) {
+//         deleteFolderRecursive(curPath);
+//       } else {
+//         fs.unlinkSync(curPath);
 //       }
 //     });
+//     fs.rmdirSync(folderPath);
+//   }
+// };
 
+// const createNetlifySite = async () => {
+//   try {
+//     const response = await axios.post(
+//       "https://api.netlify.com/api/v1/sites",
+//       {},
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
+//         },
+//       }
+//     );
+//     console.log("Netlify site created:", response.data.url);
 //     return response.data;
 //   } catch (error) {
-//     console.error('Error attaching custom domain:', error.response ? error.response.data : error.message);
+//     console.error("Error creating Netlify site:", error.message);
 //     throw error;
 //   }
-// }
+// };
 
-// // Example usage
-// const SITE_ID = '8623cbe5-37d9-4ee8-a6c1-f3f10b9b5a59';
-// // const ACCESS_TOKEN = 'your_netlify_access_token';
-// const CUSTOM_DOMAIN = 'www.collabvision.com';
-
-// attachCustomDomain(SITE_ID, process.env.NETLIFY_AUTH_TOKEN, CUSTOM_DOMAIN)
-//   .then(result => {
-//     console.log('Custom domain attached successfully:', result);
-//   })
-//   .catch(error => {
-//     console.error('Failed to attach custom domain', error);
-//   });
-
-const createZipFile = async (sourceDir) => {
-  const zipPath = `${sourceDir}.zip`;
-  const output = fs.createWriteStream(zipPath);
-  const archive = archiver("zip");
-
-  return new Promise((resolve, reject) => {
-    output.on("close", () => resolve(zipPath));
-    archive.on("error", (err) => reject(err));
-
-    archive.pipe(output);
-    archive.directory(sourceDir, false);
-    archive.finalize();
-  });
-};
-
-const deleteFolderRecursive = (folderPath) => {
-  if (fs.existsSync(folderPath)) {
-    fs.readdirSync(folderPath).forEach((file) => {
-      const curPath = path.join(folderPath, file);
-      if (fs.lstatSync(curPath).isDirectory()) {
-        deleteFolderRecursive(curPath);
-      } else {
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(folderPath);
-  }
-};
-
-const createNetlifySite = async () => {
-  try {
-    const response = await axios.post(
-      "https://api.netlify.com/api/v1/sites",
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
-        },
-      }
-    );
-    console.log("Netlify site created:", response.data.url);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating Netlify site:", error.message);
-    throw error;
-  }
-};
-
-const deployToNetlify = async (zipPath, siteId) => {
-  try {
-    const readStream = fs.createReadStream(zipPath);
-    const response = await axios.post(
-      `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
-      readStream,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
-          "Content-Type": "application/zip",
-        },
-      }
-    );
-    console.log(
-      "Netlify deployment triggered for site:",
-      response.data.deploy_ssl_url
-    );
-    return response.data.deploy_ssl_url;
-  } catch (error) {
-    console.error("Error deploying to Netlify:", error.message);
-    throw error;
-  }
-};
-
-const updateNetlifySite = async (zipPath, siteId) => {
-  try {
-    const readStream = fs.createReadStream(zipPath);
-
-    const response = await axios.post(
-      `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
-      readStream,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
-          "Content-Type": "application/zip",
-        },
-      }
-    );
-
-    console.log(
-      `Netlify deployment updated for site: ${response.data.deploy_ssl_url}`
-    );
-    return response.data.deploy_ssl_url;
-  } catch (error) {
-    console.error(
-      `Error updating Netlify site with ID ${siteId}:`,
-      error.message
-    );
-    throw error;
-  }
-};
-
-const getNetlifySiteById = async (siteId) => {
-  try {
-    const response = await axios.get(
-      `https://api.netlify.com/api/v1/sites/${siteId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error fetching site details for ID ${siteId}:`,
-      error.message
-    );
-    throw error;
-  }
-};
-
-const deleteNetlifySite = async (siteId) => {
-  try {
-    const response = await axios.delete(
-      `https://api.netlify.com/api/v1/sites/${siteId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
-        },
-      }
-    );
-    console.log(`Netlify site with ID ${siteId} has been deleted.`);
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error deleting Netlify site with ID ${siteId}:`,
-      error.message
-    );
-    throw error;
-  }
-};
-
-// app.post("/generate-sites", async (req, res) => {
-//   const { username, templateName, siteData, userId } = req.body;
-//   console.log(req.body);
+// const deployToNetlify = async (zipPath, siteId) => {
 //   try {
-//     const userDir = createWebsite(username, templateName, siteData);
-//     const zipPath = await createZipFile(userDir);
-
-//     const netlifySite = await createNetlifySite();
-//     const liveUrl = await deployToNetlify(zipPath, netlifySite.site_id);
-
-//     // Save the website details in the database
-//     const websiteData = {
-//       userId,
-//       username,
-//       templateName,
-//       siteData,
-//       siteId: netlifySite.site_id,
-//       liveUrl: liveUrl,
-//     };
-//     await createWebsiteEntry(websiteData); //database
-
-//     fs.unlinkSync(zipPath);
-//     deleteFolderRecursive(userDir);
+//     const readStream = fs.createReadStream(zipPath);
+//     const response = await axios.post(
+//       `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
+//       readStream,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
+//           "Content-Type": "application/zip",
+//         },
+//       }
+//     );
 //     console.log(
-//       `Website for ${websiteData.username}\n\n  netlify site id : ${netlifySite.site_id} \n\n\t is live at: ${liveUrl} \n\n`
+//       "Netlify deployment triggered for site:",
+//       response.data.deploy_ssl_url
+//     );
+//     return response.data.deploy_ssl_url;
+//   } catch (error) {
+//     console.error("Error deploying to Netlify:", error.message);
+//     throw error;
+//   }
+// };
+
+// const updateNetlifySite = async (zipPath, siteId) => {
+//   try {
+//     const readStream = fs.createReadStream(zipPath);
+
+//     const response = await axios.post(
+//       `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
+//       readStream,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
+//           "Content-Type": "application/zip",
+//         },
+//       }
 //     );
 
-//     res.status(200).json({
-//       site_id: netlifySite.site_id,
-//       liveUrl: liveUrl,
-//     });
-//   } catch (error) {
-//     console.error("Error:", error.message);
-//     res.status(500).send(`Failed to deploy website. Error: ${error.message}`);
-//   }
-// });
-// app.put("/update-site", async (req, res) => {
-//   const { siteId, username, templateName, siteData, userId } = req.body;
-
-//   try {
-//     // Check if the site exists
-//     console.log(`Checking if site with ID: ${siteId} exists...`);
-//     const site = await getNetlifySiteById(siteId);
-//     if (!site) {
-//       return res.status(404).send(`Site with ID ${siteId} not found.`);
-//     }
-
-//     console.log(`Site found. Updating site for ${username}...`);
-
-//     // Create the updated website content based on form data
-//     const userDir = createWebsite(username, templateName, siteData);
-//     const zipPath = await createZipFile(userDir);
-
 //     console.log(
-//       `Deploying updated content to Netlify site with ID: ${siteId}...`
+//       `Netlify deployment updated for site: ${response.data.deploy_ssl_url}`
 //     );
-//     const liveUrl = await updateNetlifySite(zipPath, siteId);
-//     console.log(`Website for ${username} updated and live at: ${liveUrl}`);
-
-//     // Clean up the files
-//     fs.unlinkSync(zipPath);
-//     deleteFolderRecursive(userDir);
-
-//     await updateWebsiteEntry(siteId, {
-//       username,
-//       templateName,
-//       siteData,
-//       liveUrl,
-//       userId,
-//     });
-
-//     res.status(200).json({
-//       site_id: siteId,
-//       liveUrl: liveUrl,
-//     });
+//     return response.data.deploy_ssl_url;
 //   } catch (error) {
-//     console.error(`Error updating site for ${username}:`, error.message);
-//     res.status(500).send(`Failed to update site. Error: ${error.message}`);
+//     console.error(
+//       `Error updating Netlify site with ID ${siteId}:`,
+//       error.message
+//     );
+//     throw error;
 //   }
-// });
+// };
 
-// Modified generate-sites endpoint
+// const getNetlifySiteById = async (siteId) => {
+//   try {
+//     const response = await axios.get(
+//       `https://api.netlify.com/api/v1/sites/${siteId}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
+//         },
+//       }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error(
+//       `Error fetching site details for ID ${siteId}:`,
+//       error.message
+//     );
+//     throw error;
+//   }
+// };
+
+// const deleteNetlifySite = async (siteId) => {
+//   try {
+//     const response = await axios.delete(
+//       `https://api.netlify.com/api/v1/sites/${siteId}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.NETLIFY_AUTH_TOKEN}`,
+//         },
+//       }
+//     );
+//     console.log(`Netlify site with ID ${siteId} has been deleted.`);
+//     return response.data;
+//   } catch (error) {
+//     console.error(
+//       `Error deleting Netlify site with ID ${siteId}:`,
+//       error.message
+//     );
+//     throw error;
+//   }
+// };
+
 app.post("/generate-sites", async (req, res) => {
   const { username, templateName, siteData, userId } = req.body;
   console.log("Generating site with data:", req.body);

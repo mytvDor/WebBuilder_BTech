@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const createTemplate2 = (userDir, data) => {
+const createTemplate3 = (userDir, data) => {
   // Process only HTML files for replacements
   const processFiles = (dir) => {
     const files = fs.readdirSync(dir);
@@ -21,31 +21,24 @@ const createTemplate2 = (userDir, data) => {
 
         // Apply all the replacements from the original createTemplate2 function
         content = content
-          .replace(/{{cafe name}}/g, data.cafeName)
+          .replace(/{{gymname}}/g, data.gymname)
           .replace(/{{about}}/g, data.about)
+          .replace(/{{address}}/g, data.address)
+
           .replace(/{{facebook}}/g, data.facebook)
           .replace(/{{instagram}}/g, data.instagram)
           .replace(/{{twitter}}/g, data.twitter)
-          .replace(/{{menu1}}/g, data.menu1)
-          .replace(/{{menu2}}/g, data.menu2)
-          .replace(/{{menu3}}/g, data.menu3)
-          .replace(/{{menu4}}/g, data.menu4)
-          .replace(/{{menu5}}/g, data.menu5)
-          .replace(/{{menu6}}/g, data.menu6)
-          .replace(/{{menu1des}}/g, data.menu1Des)
-          .replace(/{{menu2des}}/g, data.menu2Des)
-          .replace(/{{menu3des}}/g, data.menu3Des)
-          .replace(/{{menu4des}}/g, data.menu4Des)
-          .replace(/{{menu5des}}/g, data.menu5Des)
-          .replace(/{{menu6des}}/g, data.menu6Des)
-          .replace(/{{test1}}/g, data.testimonial1)
-          .replace(/{{test2}}/g, data.testimonial2)
-          .replace(/{{test3}}/g, data.testimonial3)
-          .replace(/{{test4}}/g, data.testimonial4)
-          .replace(/{{address}}/g, data.address)
-          .replace(/{{email}}/g, data.email)
+          .replace(/{{yearPlan}}/g, data.yearPlan)
+          .replace(/{{yearPrice}}/g, data.yearPrice)
+          .replace(/{{yeardescription}}/g, data.yeardescription)
+          .replace(/{{sixmonthPlan}}/g, data.sixmonthPlan)
+          .replace(/{{sixmonthPrice}}/g, data.sixmonthPrice)
+          .replace(/{{sixmonthdescription}}/g, data.sixmonthdescription)
+          .replace(/{{threemonthPlan}}/g, data.threemonthPlan)
+          .replace(/{{threemonthPrice}}/g, data.threemonthPrice)
+          .replace(/{{threemonthdescription}}/g, data.threemonthdescription)
           .replace(/{{phone}}/g, data.phone)
-          .replace(/{{time}}/g, data.time);
+          .replace(/{{email}}/g, data.email);
 
         fs.writeFileSync(filePath, content);
       }
@@ -56,4 +49,4 @@ const createTemplate2 = (userDir, data) => {
   return userDir;
 };
 
-module.exports = createTemplate2;
+module.exports = createTemplate3;
