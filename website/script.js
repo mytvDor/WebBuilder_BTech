@@ -1,5 +1,5 @@
-//  Add JavaScript functionality here as needed.  For example, you could add a form submission handler or dynamic content loading.
-
-//This is a placeholder.  No significant javascript is needed for this simplified example.
-console.log("JavaScript file loaded");
-
+document.getElementById('add-to-cart').addEventListener('click', function() {
+    // Replace this with actual add-to-cart functionality
+    // This might involve interacting with a backend or local storage
+    alert('Added to cart!');
+});
