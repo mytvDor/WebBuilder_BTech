@@ -55,7 +55,9 @@ app.use(
 );
 
 const genAI = new GoogleGenerativeAI(`${process.env.GEMINI_TOKEN}`);
-
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
 app.post("/generate-sites", async (req, res) => {
   const { username, templateName, siteData, userId } = req.body;
   console.log("Generating site with data:", req.body);
