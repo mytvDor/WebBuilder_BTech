@@ -47,7 +47,12 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 // const USER_WEBSITES_DIR = path.join(__dirname, "user-websites");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 const genAI = new GoogleGenerativeAI(`${process.env.GEMINI_TOKEN}`);
 
